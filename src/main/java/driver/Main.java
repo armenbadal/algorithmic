@@ -10,7 +10,7 @@ public class Main {
 
     public static void main( String[] args ) throws Exception
     {
-        CharStream input = CharStreams.fromFileName("C:\\Projects\\agorithmic-2\\cases\\case00.alg");
+        CharStream input = CharStreams.fromFileName("C:\\Projects\\algorithmic\\cases\\case00.alg");
         AlgorithmicLexer lexer = new AlgorithmicLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         AlgorithmicParser parser = new AlgorithmicParser(tokens);

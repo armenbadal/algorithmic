@@ -35,7 +35,33 @@ newLines
     : NL+
     ;
 
+declarationList
+    : declaration (',' declaration)*
+    ;
 
+declaration
+    : scalarType declname
+    ;
+
+declName
+    : IDENTIFIER
+    | KW_AGHYUSAK IDENTIFIER '[' range ']'
+    | KW_AGHYUSAK IDENTIFIER '[' range ',' range ]'
+    ;
+
+range
+    : INTEGER ':' INTEGER
+    ;
+
+power
+    : unary ('**' power)?
+    ;
+
+unary
+    : '-' factor
+    | KW_VOCH factor
+    | factor
+    ;
 
 factor
     : IDENTIFIER
@@ -62,6 +88,11 @@ KW_AYLAPES : 'այլապես';
 KW_AVART : 'ավարտ';
 KW_QANI : 'քանի';
 KW_DER : 'դեռ';
+KW_TOGH : 'թող';
+KW_MINCHEV : 'մինչև';
+KW_QAYL : 'քայլ';
+KW_CS : 'ցս';
+KW_CV : 'ցվ';
 
 
 IDENTIFIER : [ա-ևa-z][ա-ևa-z0-9]*;

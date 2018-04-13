@@ -40,21 +40,81 @@ declarationList
     ;
 
 declaration
-    : scalarType declname
+    : scalarType declName
     ;
 
 declName
     : IDENTIFIER
     | KW_AGHYUSAK IDENTIFIER '[' range ']'
-    | KW_AGHYUSAK IDENTIFIER '[' range ',' range ]'
+    | KW_AGHYUSAK IDENTIFIER '[' range ',' range ']'
     ;
 
 range
-    : INTEGER ':' INTEGER
+    : lower=INTEGER ':' upper=INTEGER
+    ;
+
+
+// statements
+statementList
+    : (statement newLines)*
+    ;
+
+statement
+    : assign | branch | condLoop | countLoop | select | algCall
+    ;
+
+assign
+    : IDENTIFIER index? ':=' expression
+    ;
+
+index
+    : '[' INTEGER ']'
+    | '[' INTEGER ',' INTEGER ']'
+    ;
+
+branch
+    : KW_YETE expression newLines
+      KW_APA statementList
+      (KW_AYLAPES statementList)
+      KW_AVART
+    ;
+
+condLoop
+    : KW_QANI KW_DER expression newLines
+      KW_CS statementList KW_CV
+    ;
+
+countLoop
+    : KW_TOGH IDENTIFIER KW_MINCHEV expression (KW_QAYL INTEGER) newLines
+      KW_CS statementList KW_CV
+    ;
+
+select
+    : KW_YNTREL newLines
+      (KW_YERB expression ':' statementList)+
+      (KW_AYLAPES statementList)?
+      KW_AVART
+    ;
+
+algCall
+    : IDENTIFIER ('(' (expression (',' expression)*)? ')')?
+    ;
+
+// expressions
+expression
+    : addition (oper=('=' | '<>' | '>' | '>=' | '<' | '<=') addition)?
+    ;
+
+addition
+    : multiplication (oper=(OP_PLUS | OP_MINUS | KW_KAM) multiplication)*
+    ;
+
+multiplication
+    : power (oper=(OP_MULT | OP_DIV | KW_YEV) power)*
     ;
 
 power
-    : unary ('**' power)?
+    : unary (OP_POW power)?
     ;
 
 unary
@@ -64,14 +124,17 @@ unary
     ;
 
 factor
-    : IDENTIFIER
-    | INTEGER
-    | REAL
-    | TEXT
+    : '(' expression ')' # highPriority
+    | IDENTIFIER '(' (expression (',' expression)*)? ')' # funcCall
+    | IDENTIFIER index # arrayElement
+    | IDENTIFIER # variable
+    | INTEGER # integerLiteral
+    | REAL # realLiteral
+    | TEXT # textLiteral
     ;
 
 
-
+// tokens
 KW_ALG : 'ալգ';
 KW_ARG : 'արգ';
 KW_ARD : 'արդ';
@@ -93,14 +156,40 @@ KW_MINCHEV : 'մինչև';
 KW_QAYL : 'քայլ';
 KW_CS : 'ցս';
 KW_CV : 'ցվ';
+KW_YNTREL : 'ընտրել';
+KW_YERB : 'երբ';
+KW_YEV : 'և' | 'եւ';
+KW_KAM : 'կամ';
+KW_VOCH : 'ոչ';
+
+OP_PLUS : '+';
+OP_MINUS : '-';
+OP_MULT : '*';
+OP_DIV : '/';
+OP_POW : '**';
+OP_EQ : '=';
+OP_NE : '<>';
+OP_GT : '>';
+OP_GE : '>=';
+OP_LT : '<';
+OP_LE : '<=';
 
 
-IDENTIFIER : [ա-ևa-z][ա-ևa-z0-9]*;
+IDENTIFIER : LETTER(LETTER | DIGIT)*;
 
-REAL : [0-9]+'.'[0-9]+;
-INTEGER : [0-9]+;
-TEXT : '"'.*'"' | '«'.*'»';
+REAL : DIGIT+'.'DIGIT+;
+INTEGER : DIGIT+;
+TEXT : '"'(~'"')*'"' | '«'(~'»')*'»';
 
 NL : ';' | '\n';
 
 WS : [ \t\r]+ -> skip;
+
+fragment LETTER
+    : [ա-ևa-z]
+    ;
+
+fragment DIGIT
+    : [0-9]
+    ;
+

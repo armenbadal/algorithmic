@@ -1,7 +1,7 @@
 
 package ast;
 
-public class Symbol {
+public class Symbol implements Node {
     public String name = null;
     public Type type = null;
 

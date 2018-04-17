@@ -6,11 +6,12 @@ package parser;
 }
 
 program
-    : newLines? algorithm*
+    : NL* (algorithm NL+)*
     ;
 
 algorithm
-    : KW_ALG scalarType? IDENTIFIER parameterList? newLines
+    : 'ալգ' scalarType? IDENT parameterList? NL+
+      'սկիզբ' declarationList? NL+ statementList? 'վերջ'
     ;
 
 scalarType
@@ -26,13 +27,9 @@ parameter
     ;
 
 paramName
-    : IDENTIFIER
-    | KW_AGHYUSAK IDENTIFIER '[' ']'
-    | KW_AGHYUSAK IDENTIFIER '[' ':' ']'
-    ;
-
-newLines
-    : NL+
+    : IDENT
+    | KW_AGHYUSAK IDENT '[' ']'
+    | KW_AGHYUSAK IDENT '[' ':' ']'
     ;
 
 declarationList
@@ -44,9 +41,9 @@ declaration
     ;
 
 declName
-    : IDENTIFIER
-    | KW_AGHYUSAK IDENTIFIER '[' range ']'
-    | KW_AGHYUSAK IDENTIFIER '[' range ',' range ']'
+    : IDENT
+    | KW_AGHYUSAK IDENT '[' range ']'
+    | KW_AGHYUSAK IDENT '[' range ',' range ']'
     ;
 
 range
@@ -56,7 +53,7 @@ range
 
 // statements
 statementList
-    : (statement newLines)*
+    : NL* (statement NL+)*
     ;
 
 statement
@@ -64,73 +61,65 @@ statement
     ;
 
 assign
-    : IDENTIFIER index? ':=' expression
+    : IDENT index? ':=' expression
     ;
 
 index
-    : '[' INTEGER ']'
-    | '[' INTEGER ',' INTEGER ']'
+    : '[' expression ']'
+    | '[' expression ',' expression ']'
     ;
 
 branch
-    : KW_YETE expression newLines
-      KW_APA statementList
-      (KW_AYLAPES statementList)
-      KW_AVART
+    : 'եթե' expression NL+ 'ապա' statementList alternative? 'ավարտ'
+    ;
+
+alternative
+    : 'այլապես' statementList
     ;
 
 condLoop
-    : KW_QANI KW_DER expression newLines
-      KW_CS statementList KW_CV
+    : 'քանի' 'դեռ' expression NL+ 'ցս' statementList 'ցվ'
     ;
 
 countLoop
-    : KW_TOGH IDENTIFIER KW_MINCHEV expression (KW_QAYL INTEGER) newLines
-      KW_CS statementList KW_CV
+    : 'թող' IDENT 'սկսած' start=expression 'մինչև' stop=expression
+      ('քայլ' INTEGER)? NL+ 'ցս' statementList 'ցվ'
     ;
 
 select
-    : KW_YNTREL newLines
-      (KW_YERB expression ':' statementList)+
-      (KW_AYLAPES statementList)?
-      KW_AVART
+    : 'ընտրել' NL+ oneCase+ alternative? 'ավարտ'
+    ;
+
+oneCase
+    : 'երբ' expression ':' statementList
     ;
 
 algCall
-    : IDENTIFIER ('(' (expression (',' expression)*)? ')')?
+    : IDENT ('(' (expression (',' expression)*)? ')')?
     ;
 
 // expressions
 expression
-    : addition (oper=('=' | '<>' | '>' | '>=' | '<' | '<=') addition)?
+    : simple                                                    # simpleExpr
+    | '(' expression ')'                                        # priority
+    | ID '[' expression (',' expression)? ']'                   # arrayElem
+    | ID '(' (expression (',' expression)*)? ')'                # funcall
+    | op=('ոչ' | '-' | '+') expression                          # unary
+    | <assoc=right> le=expression op='**' re=expression         # power
+    | le=expression op=('*' | '/') re=expression                # multiplication
+    | le=expression op=('+' | '-') re=expression                # addition
+    | le=expression op=('>' | '>=' | '<' | '<=') re=expression  # comparison
+    | le=expression op=('=' | '<>') re=expression               # equality
+    | le=expression op='և' re=expression                        # conjunction
+    | le=expression op='կամ' re=expression                      # disjunction
     ;
 
-addition
-    : multiplication (oper=(OP_PLUS | OP_MINUS | KW_KAM) multiplication)*
-    ;
-
-multiplication
-    : power (oper=(OP_MULT | OP_DIV | KW_YEV) power)*
-    ;
-
-power
-    : unary (OP_POW power)?
-    ;
-
-unary
-    : '-' factor
-    | KW_VOCH factor
-    | factor
-    ;
-
-factor
-    : '(' expression ')' # highPriority
-    | IDENTIFIER '(' (expression (',' expression)*)? ')' # funcCall
-    | IDENTIFIER index # arrayElement
-    | IDENTIFIER # variable
-    | INTEGER # integerLiteral
-    | REAL # realLiteral
-    | TEXT # textLiteral
+simple
+    : TEXT     # textLiteral
+    | REAL     # realLiteral
+    | INTEGER  # integerLiteral
+    | LOGICAL  # logicalLiteral
+    | IDENT    # variable
     ;
 
 
@@ -152,6 +141,7 @@ KW_AVART : 'ավարտ';
 KW_QANI : 'քանի';
 KW_DER : 'դեռ';
 KW_TOGH : 'թող';
+KW_SKSAC : 'սկսած';
 KW_MINCHEV : 'մինչև';
 KW_QAYL : 'քայլ';
 KW_CS : 'ցս';
@@ -161,6 +151,8 @@ KW_YERB : 'երբ';
 KW_YEV : 'և' | 'եւ';
 KW_KAM : 'կամ';
 KW_VOCH : 'ոչ';
+//KW_CHISHT : 'ճիշտ';
+//KW_KEGHC : 'կեղծ';
 
 OP_PLUS : '+';
 OP_MINUS : '-';
@@ -174,12 +166,13 @@ OP_GE : '>=';
 OP_LT : '<';
 OP_LE : '<=';
 
-
-IDENTIFIER : LETTER(LETTER | DIGIT)*;
+IDENT : LETTER(LETTER | DIGIT)*;
 
 REAL : DIGIT+'.'DIGIT+;
 INTEGER : DIGIT+;
 TEXT : '"'(~'"')*'"' | '«'(~'»')*'»';
+LOGICAL : 'ճիշտ' | 'կեղծ';
+
 
 NL : ';' | '\n';
 
@@ -192,4 +185,3 @@ fragment LETTER
 fragment DIGIT
     : [0-9]
     ;
-

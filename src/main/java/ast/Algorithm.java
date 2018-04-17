@@ -3,10 +3,15 @@ package ast;
 
 public class Algorithm implements Node {
     public String name = null;
-    public Type type = null;
+    public Scalar type = null;
     public Symbol[] parameters = null;
     public Statement body = null;
 
-    public Algorithm()
-    {}
+    public Symbol[] locals = null;
+
+    public Algorithm( String nm, Scalar rty )
+    {
+        name = nm;
+        type = rty;
+    }
 }

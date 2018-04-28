@@ -1,59 +1,50 @@
 
 grammar Algorithmic;
 
-@header {
-package parser;
-}
-
+// ծրագիրը ալգորիթմների շարք է
 program
-    : NL* (algorithm NL+)*
+    : NL? (algorithm NL)*
     ;
 
 algorithm
-    : 'ալգ' scalarType? IDENT parameterList? NL+
-      'սկիզբ' declarationList? NL+ statementList? 'վերջ'
+    : 'ալգ' scalar? IDENT ('(' (parameter (',' parameter)*)? ')')? NL
+      'սկիզբ' NL? (declaration NL)* sequence 'վերջ'
     ;
 
-scalarType
+// սկալյար տիպեր
+scalar
     : KW_TRAM | KW_AMB | KW_IRK | KW_TEQST
     ;
 
-parameterList
-    : '(' (parameter (',' parameter)*)? ')'
-    ;
-
+// պարամետրեր
 parameter
-    : (KW_ARG | KW_ARD)? scalarType paramName (',' paramName)*
+    : (KW_ARG | KW_ARD)? scalar paramName (',' paramName)*
     ;
 
 paramName
-    : IDENT
-    | KW_AGHYUSAK IDENT '[' ']'
-    | KW_AGHYUSAK IDENT '[' ':' ']'
+    : IDENT                         # simpleParam
+    | 'աղյուսակ' IDENT '[' ']'      # vectorParam
+    | 'աղյուսակ' IDENT '[' ',' ']'  # matrixParam
     ;
 
-declarationList
-    : declaration (',' declaration)*
-    ;
-
+// հայտարարություններ
 declaration
-    : scalarType declName
+    : scalar declName (',' declName)*
     ;
 
 declName
-    : IDENT
-    | KW_AGHYUSAK IDENT '[' range ']'
-    | KW_AGHYUSAK IDENT '[' range ',' range ']'
+    : IDENT                                     # simpleDecl
+    | 'աղյուսակ' IDENT '[' range ']'            # vectorDecl
+    | 'աղյուսակ' IDENT '[' range ',' range ']'  # matrixDecl
     ;
 
 range
     : lower=INTEGER ':' upper=INTEGER
     ;
 
-
-// statements
-statementList
-    : NL* (statement NL+)*
+// ղեկավարող կառուցվածքներ
+sequence
+    : (statement NL)*
     ;
 
 statement
@@ -70,28 +61,28 @@ index
     ;
 
 branch
-    : 'եթե' expression NL+ 'ապա' statementList alternative? 'ավարտ'
+    : 'եթե' expression NL 'ապա' NL? sequence alternative? 'ավարտ'
     ;
 
 alternative
-    : 'այլապես' statementList
+    : 'այլապես' NL? sequence
     ;
 
 condLoop
-    : 'քանի' 'դեռ' expression NL+ 'ցս' statementList 'ցվ'
+    : 'քանի' 'դեռ' expression NL 'ցս' NL? sequence 'ցվ'
     ;
 
 countLoop
     : 'թող' IDENT 'սկսած' start=expression 'մինչև' stop=expression
-      ('քայլ' INTEGER)? NL+ 'ցս' statementList 'ցվ'
+      ('քայլ' step=INTEGER)? NL 'ցս' NL? sequence 'ցվ'
     ;
 
 select
-    : 'ընտրել' NL+ oneCase+ alternative? 'ավարտ'
+    : 'ընտրել' NL oneCase+ alternative? 'ավարտ'
     ;
 
 oneCase
-    : 'երբ' expression ':' statementList
+    : 'երբ' expression ':' NL? sequence
     ;
 
 algCall
@@ -102,8 +93,8 @@ algCall
 expression
     : simple                                                    # simpleExpr
     | '(' expression ')'                                        # priority
-    | ID '[' expression (',' expression)? ']'                   # arrayElem
-    | ID '(' (expression (',' expression)*)? ')'                # funcall
+    | IDENT '[' expression (',' expression)? ']'                # arrayElem
+    | IDENT '(' (expression (',' expression)*)? ')'             # funcall
     | op=('ոչ' | '-' | '+') expression                          # unary
     | <assoc=right> le=expression op='**' re=expression         # power
     | le=expression op=('*' | '/') re=expression                # multiplication
@@ -166,15 +157,15 @@ OP_GE : '>=';
 OP_LT : '<';
 OP_LE : '<=';
 
-IDENT : LETTER(LETTER | DIGIT)*;
-
-REAL : DIGIT+'.'DIGIT+;
-INTEGER : DIGIT+;
-TEXT : '"'(~'"')*'"' | '«'(~'»')*'»';
+REAL    : DIGIT+'.'DIGIT+;
+INTEGER : ('-'|'+')? DIGIT+;
+TEXT    : '"'(~'"')*'"' | '«'(~'»')*'»';
 LOGICAL : 'ճիշտ' | 'կեղծ';
 
+IDENT : LETTER(LETTER | DIGIT)*;
 
-NL : ';' | '\n';
+
+NL : [;\n]+;
 
 WS : [ \t\r]+ -> skip;
 

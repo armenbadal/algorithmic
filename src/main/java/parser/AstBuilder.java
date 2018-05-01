@@ -27,9 +27,10 @@ public class AstBuilder extends AlgorithmicBaseVisitor<Node> {
     public Node visitAlgorithm(AlgorithmicParser.AlgorithmContext ctx)
     {
         String name = ctx.IDENT().getText();
-        Scalar rty = (Scalar)visitScalarType(ctx.scalarType());
+        Scalar rty = (Scalar)visitScalar(ctx.scalar());
 
-        List<AlgorithmicParser.ParameterContext> prs = ctx.parameterList().parameter();
+        List<AlgorithmicParser.ParameterContext> prs = ctx.parameter();
+
 
         current = new Algorithm(name, rty);
 
@@ -37,26 +38,15 @@ public class AstBuilder extends AlgorithmicBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitScalarType(AlgorithmicParser.ScalarTypeContext ctx)
+    public Node visitScalar(AlgorithmicParser.ScalarContext ctx)
     {
-        Scalar sty = new Scalar('V');
-
-        if( ctx.KW_TRAM() != null )
-            sty.id = 'L';
-        else if( ctx.KW_AMB() != null )
-            sty.id = 'I';
-        else if( ctx.KW_IRK() != null )
-            sty.id = 'R';
-        else if( ctx.KW_TEQST() != null )
-            sty.id = 'T';
-
-        return sty;
+        return new Scalar(ctx.nid);
     }
 
     @Override
     public Node visitParameter(AlgorithmicParser.ParameterContext ctx)
     {
-        String nm = ctx.paramName()
+        //String nm = ctx.paramName()
         return visitChildren(ctx);
     }
 

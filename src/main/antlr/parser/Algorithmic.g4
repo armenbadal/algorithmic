@@ -1,6 +1,10 @@
 
 grammar Algorithmic;
 
+@header{
+package parser;
+}
+
 // ծրագիրը ալգորիթմների շարք է
 program
     : NL? (algorithm NL)*
@@ -13,7 +17,11 @@ algorithm
 
 // սկալյար տիպեր
 scalar
-    : KW_TRAM | KW_AMB | KW_IRK | KW_TEQST
+locals [char nid]
+    : KW_TRAM  { $nid = 'L'; }
+    | KW_AMB   { $nid = 'I'; }
+    | KW_IRK   { $nid = 'R'; }
+    | KW_TEQST { $nid = 'T'; }
     ;
 
 // պարամետրեր
@@ -115,47 +123,47 @@ simple
 
 
 // tokens
-KW_ALG : 'ալգ';
-KW_ARG : 'արգ';
-KW_ARD : 'արդ';
-KW_TRAM : 'տրամ';
-KW_AMB : 'ամբ';
-KW_IRK : 'իրկ';
-KW_TEQST : 'տեքստ';
+KW_ALG      : 'ալգ';
+KW_ARG      : 'արգ';
+KW_ARD      : 'արդ';
+KW_TRAM     : 'տրամ';
+KW_AMB      : 'ամբ';
+KW_IRK      : 'իրկ';
+KW_TEQST    : 'տեքստ';
 KW_AGHYUSAK : 'աղյուսակ';
-KW_SKIZB : 'սկիզբ';
-KW_VERJ : 'վերջ';
-KW_YETE : 'եթե';
-KW_APA : 'ապա';
-KW_AYLAPES : 'այլապես';
-KW_AVART : 'ավարտ';
-KW_QANI : 'քանի';
-KW_DER : 'դեռ';
-KW_TOGH : 'թող';
-KW_SKSAC : 'սկսած';
-KW_MINCHEV : 'մինչև';
-KW_QAYL : 'քայլ';
-KW_CS : 'ցս';
-KW_CV : 'ցվ';
-KW_YNTREL : 'ընտրել';
-KW_YERB : 'երբ';
-KW_YEV : 'և' | 'եւ';
-KW_KAM : 'կամ';
-KW_VOCH : 'ոչ';
+KW_SKIZB    : 'սկիզբ';
+KW_VERJ     : 'վերջ';
+KW_YETE     : 'եթե';
+KW_APA      : 'ապա';
+KW_AYLAPES  : 'այլապես';
+KW_AVART    : 'ավարտ';
+KW_QANI     : 'քանի';
+KW_DER      : 'դեռ';
+KW_TOGH     : 'թող';
+KW_SKSAC    : 'սկսած';
+KW_MINCHEV  : 'մինչև';
+KW_QAYL     : 'քայլ';
+KW_CS       : 'ցս';
+KW_CV       : 'ցվ';
+KW_YNTREL   : 'ընտրել';
+KW_YERB     : 'երբ';
+KW_YEV      : 'և' | 'եւ';
+KW_KAM      : 'կամ';
+KW_VOCH     : 'ոչ';
 //KW_CHISHT : 'ճիշտ';
-//KW_KEGHC : 'կեղծ';
+//KW_KEGHC  : 'կեղծ';
 
-OP_PLUS : '+';
+OP_PLUS  : '+';
 OP_MINUS : '-';
-OP_MULT : '*';
-OP_DIV : '/';
-OP_POW : '**';
-OP_EQ : '=';
-OP_NE : '<>';
-OP_GT : '>';
-OP_GE : '>=';
-OP_LT : '<';
-OP_LE : '<=';
+OP_MULT  : '*';
+OP_DIV   : '/';
+OP_POW   : '**';
+OP_EQ    : '=';
+OP_NE    : '<>';
+OP_GT    : '>';
+OP_GE    : '>=';
+OP_LT    : '<';
+OP_LE    : '<=';
 
 REAL    : DIGIT+'.'DIGIT+;
 INTEGER : ('-'|'+')? DIGIT+;

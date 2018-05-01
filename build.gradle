@@ -8,12 +8,8 @@ plugins {
 mainClassName = 'driver.Main'
 
 dependencies {
-    compile 'com.google.guava:guava:23.0'
     compile 'org.apache.bcel:bcel:6.2'
-
     antlr "org.antlr:antlr4:4.7.1"
-
-    testCompile 'junit:junit:4.12'
 }
 
 repositories {

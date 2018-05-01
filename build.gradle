@@ -20,3 +20,8 @@ generateGrammarSource {
     maxHeapSize = "64m"
     arguments += ["-encoding", "utf-8", "-no-listener", "-visitor", "-long-messages"]
 }
+
+run {
+    args "${projectDir}/cases/case01.alg"
+}
+

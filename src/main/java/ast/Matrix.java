@@ -2,12 +2,17 @@
 package ast;
 
 public class Matrix implements Type {
-    public Scalar base = null;
-    public int colow = 0;
-    public int coup = 0;
-    public int rolow = 0;
-    public int roup = 0;
+    public Scalar base;
+    public int colow;
+    public int coup;
+    public int rolow;
+    public int roup;
 
+	public Matrix()
+	{
+		this(null, 0, 0, 0, 0);
+	}
+	
     public Matrix( Scalar b, int cl, int cu, int rl, int ru )
     {
         base = b;
@@ -16,4 +21,11 @@ public class Matrix implements Type {
         rolow = rl;
         roup = ru;
     }
+
+	@Override
+	public String toString()
+	{
+		return String.format("%s աղյուսակ[%d:%d, %d:%d]",
+              base.toString(), colow, coup, rolow, roup);
+	}
 }

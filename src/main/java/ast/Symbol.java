@@ -10,4 +10,11 @@ public class Symbol implements Node {
         name = nm;
         type = ty;
     }
+
+	@Override
+	public String toString()
+	{
+		return type.toString() + " " + name;
+	}
 }
+

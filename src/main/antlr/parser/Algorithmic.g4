@@ -41,13 +41,9 @@ declaration
     ;
 
 declName
-    : IDENT                                     # simpleDecl
-    | 'աղյուսակ' IDENT '[' range ']'            # vectorDecl
-    | 'աղյուսակ' IDENT '[' range ',' range ']'  # matrixDecl
-    ;
-
-range
-    : lower=INTEGER ':' upper=INTEGER
+    : IDENT  # simpleDecl
+    | 'աղյուսակ' IDENT '[' el=INTEGER ':' eh=INTEGER ']'  # vectorDecl
+    | 'աղյուսակ' IDENT '[' cl=INTEGER ':' ch=INTEGER ',' rl=INTEGER ':' rh=INTEGER ']'  # matrixDecl
     ;
 
 // ղեկավարող կառուցվածքներ

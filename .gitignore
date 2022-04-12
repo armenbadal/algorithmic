@@ -17,3 +17,5 @@ gradle-app.setting
 out
 
 .antlr
+/gradle/
+gradlew*
